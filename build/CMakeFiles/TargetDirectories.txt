@@ -1,0 +1,3 @@
+/Users/bat-ulziipurev-ochir/VS/crs/Pong++/build/CMakeFiles/PongPlusPlus.dir
+/Users/bat-ulziipurev-ochir/VS/crs/Pong++/build/CMakeFiles/edit_cache.dir
+/Users/bat-ulziipurev-ochir/VS/crs/Pong++/build/CMakeFiles/rebuild_cache.dir
