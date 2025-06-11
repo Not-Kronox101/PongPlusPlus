@@ -3,8 +3,8 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17
 
 # MSYS2 MinGW64 specific paths (assuming Raylib is in C:)
-INCLUDES = -I/c/raylib/include
-LDFLAGS = -L/c/raylib/lib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+INCLUDES = -I/mingw64/raylib/include
+LDFLAGS = -L/mingw64/raylib/lib -lraylib -opengl32 -lgdi32 -lwinmm
 
 # Directories
 SRC_DIR = src
