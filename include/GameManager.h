@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <vector>
-#include "/opt/homebrew/Cellar/raylib/5.5/include/raylib.h"
+#include "raylib.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "PowerUp.h"
@@ -11,6 +11,12 @@
 
 
 namespace PongPlusPlus {
+
+enum class GameState {
+    START_SCREEN,
+    PLAYING,
+    END_SCREEN
+};
 
 class GameManager {
 public:
@@ -27,6 +33,8 @@ private:
     void spawnPowerUp();
     void handlePowerUpCollision();
     void resetGame();
+    void drawStartScreen();
+    void drawEndScreen();
     
     std::unique_ptr<Paddle> player1;
     std::unique_ptr<Paddle> player2;
@@ -39,6 +47,9 @@ private:
     bool gameOver;
     float powerUpSpawnTimer;
     const float POWERUP_SPAWN_INTERVAL = 10.0f;
+    
+    GameState currentState;
+    int winner; // 1 for player1, 2 for player2, 0 for no winner yet
 };
 
 } // namespace PongPlusPlus 

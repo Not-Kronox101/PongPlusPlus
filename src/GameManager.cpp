@@ -7,6 +7,8 @@ GameManager::GameManager()
     , player2Score(0)
     , gameOver(false)
     , powerUpSpawnTimer(0.0f)
+    , currentState(GameState::START_SCREEN)
+    , winner(0)
 {
     initializeGame();
 }
@@ -29,35 +31,51 @@ void GameManager::initializeGame() {
 }
 
 void GameManager::update() {
-    if (gameOver) {
-        if (IsKeyPressed(KEY_SPACE)) {
-            resetGame();
-        }
-        return;
+    switch (currentState) {
+        case GameState::START_SCREEN:
+            if (IsKeyPressed(KEY_SPACE)) {
+                currentState = GameState::PLAYING;
+            }
+            break;
+            
+        case GameState::PLAYING:
+            // Update paddles
+            player1->update(true);
+            player2->update(false);
+            
+            // Update main ball
+            ball->update(*player1, *player2);
+            
+            // Update power-up
+            powerUp->update(*ball);
+            
+            // Handle power-up spawning
+            powerUpSpawnTimer += GetFrameTime();
+            if (powerUpSpawnTimer >= POWERUP_SPAWN_INTERVAL) {
+                spawnPowerUp();
+                powerUpSpawnTimer = 0.0f;
+            }
+            
+            // Handle power-up collision
+            handlePowerUpCollision();
+            
+            // Handle ball out of bounds
+            handleBallOutOfBounds();
+            
+            // Check for game over
+            if (gameOver) {
+                winner = (player1Score > player2Score) ? 1 : 2;
+                currentState = GameState::END_SCREEN;
+            }
+            break;
+            
+        case GameState::END_SCREEN:
+            if (IsKeyPressed(KEY_SPACE)) {
+                resetGame();
+                currentState = GameState::START_SCREEN;
+            }
+            break;
     }
-    
-    // Update paddles
-    player1->update(true);
-    player2->update(false);
-    
-    // Update main ball
-    ball->update(*player1, *player2);
-    
-    // Update power-up
-    powerUp->update(*ball);
-    
-    // Handle power-up spawning
-    powerUpSpawnTimer += GetFrameTime();
-    if (powerUpSpawnTimer >= POWERUP_SPAWN_INTERVAL) {
-        spawnPowerUp();
-        powerUpSpawnTimer = 0.0f;
-    }
-    
-    // Handle power-up collision
-    handlePowerUpCollision();
-    
-    // Handle ball out of bounds
-    handleBallOutOfBounds();
 }
 
 void GameManager::draw() {
@@ -65,32 +83,95 @@ void GameManager::draw() {
     {
         ClearBackground(BACKGROUND_COLOR);
         
-        // Draw paddles
-        player1->draw();
-        player2->draw();
-        
-        // Draw ball only if game is not over
-        if (!gameOver) {
-            ball->draw();
-        }
-        
-        // Draw power-up
-        powerUp->draw();
-        
-        // Draw UI
-        ui->drawScore(player1Score, player2Score);
-        
-        // Draw power-up message if active
-        if (powerUp->getMessageTimer() > 0) {
-            ui->drawPowerUpMessage(powerUp->getMessage());
-        }
-        
-        if (gameOver) {
-            ui->drawWinner(player1Score > player2Score ? 1 : 2);
-            ui->drawRestartMessage();
+        switch (currentState) {
+            case GameState::START_SCREEN:
+                drawStartScreen();
+                break;
+                
+            case GameState::PLAYING:
+                // Draw paddles
+                player1->draw();
+                player2->draw();
+                
+                // Draw ball
+                ball->draw();
+                
+                // Draw power-up
+                powerUp->draw();
+                
+                // Draw UI
+                ui->drawScore(player1Score, player2Score);
+                
+                // Draw power-up message if active
+                if (powerUp->getMessageTimer() > 0) {
+                    ui->drawPowerUpMessage(powerUp->getMessage());
+                }
+                break;
+                
+            case GameState::END_SCREEN:
+                drawEndScreen();
+                break;
         }
     }
     EndDrawing();
+}
+
+void GameManager::drawStartScreen() {
+    const char* title = "PONG++";
+    const char* startMessage = "Press SPACE to Start";
+    
+    int titleWidth = MeasureText(title, 60);
+    int messageWidth = MeasureText(startMessage, 30);
+    
+    // Draw title and start message
+    DrawText(title, SCREEN_WIDTH/2 - titleWidth/2, SCREEN_HEIGHT/6, 60, WHITE);
+    DrawText(startMessage, SCREEN_WIDTH/2 - messageWidth/2, SCREEN_HEIGHT*4/5, 30, WHITE);
+    
+    // Draw control diagram
+    const int PADDLE_WIDTH = 20;
+    const int PADDLE_HEIGHT = 100;
+    const int PADDLE_SPACING = 200;
+    const int CENTER_Y = SCREEN_HEIGHT/2;
+    
+    // Draw left paddle (Player 1)
+    DrawRectangle(SCREEN_WIDTH/2 - PADDLE_SPACING, CENTER_Y - PADDLE_HEIGHT/2, 
+                 PADDLE_WIDTH, PADDLE_HEIGHT, WHITE);
+    DrawText("W", SCREEN_WIDTH/2 - PADDLE_SPACING - 30, CENTER_Y - 40, 30, WHITE);
+    DrawText("S", SCREEN_WIDTH/2 - PADDLE_SPACING - 30, CENTER_Y + 10, 30, WHITE);
+    DrawText("Player 1", SCREEN_WIDTH/2 - PADDLE_SPACING - 80, CENTER_Y - PADDLE_HEIGHT/2 - 30, 20, WHITE);
+    
+    // Draw right paddle (Player 2)
+    DrawRectangle(SCREEN_WIDTH/2 + PADDLE_SPACING - PADDLE_WIDTH, CENTER_Y - PADDLE_HEIGHT/2, 
+                 PADDLE_WIDTH, PADDLE_HEIGHT, WHITE);
+    DrawText("UP", SCREEN_WIDTH/2 + PADDLE_SPACING + 10, CENTER_Y - 40, 20, WHITE);
+    DrawText("DOWN", SCREEN_WIDTH/2 + PADDLE_SPACING + 10, CENTER_Y + 10, 20, WHITE);
+    DrawText("Player 2", SCREEN_WIDTH/2 + PADDLE_SPACING + 10, CENTER_Y - PADDLE_HEIGHT/2 - 30, 20, WHITE);
+    
+    // Draw connecting lines
+    DrawLine(SCREEN_WIDTH/2 - PADDLE_SPACING - 30, CENTER_Y - 40, 
+             SCREEN_WIDTH/2 - PADDLE_SPACING, CENTER_Y - 40, WHITE);
+    DrawLine(SCREEN_WIDTH/2 - PADDLE_SPACING - 30, CENTER_Y + 10, 
+             SCREEN_WIDTH/2 - PADDLE_SPACING, CENTER_Y + 10, WHITE);
+    DrawLine(SCREEN_WIDTH/2 + PADDLE_SPACING, CENTER_Y - 40, 
+             SCREEN_WIDTH/2 + PADDLE_SPACING + 50, CENTER_Y - 40, WHITE);
+    DrawLine(SCREEN_WIDTH/2 + PADDLE_SPACING, CENTER_Y + 10, 
+             SCREEN_WIDTH/2 + PADDLE_SPACING + 70, CENTER_Y + 10, WHITE);
+}
+
+void GameManager::drawEndScreen() {
+    const char* gameOverText = "GAME OVER";
+    char winnerText[50];
+    const char* restartMessage = "Press SPACE to Play Again";
+    
+    sprintf(winnerText, "Player %d Wins!", winner);
+    
+    int gameOverWidth = MeasureText(gameOverText, 60);
+    int winnerWidth = MeasureText(winnerText, 40);
+    int restartWidth = MeasureText(restartMessage, 30);
+    
+    DrawText(gameOverText, SCREEN_WIDTH/2 - gameOverWidth/2, SCREEN_HEIGHT/3, 60, WHITE);
+    DrawText(winnerText, SCREEN_WIDTH/2 - winnerWidth/2, SCREEN_HEIGHT/2, 40, WHITE);
+    DrawText(restartMessage, SCREEN_WIDTH/2 - restartWidth/2, SCREEN_HEIGHT*2/3, 30, WHITE);
 }
 
 void GameManager::handleBallOutOfBounds() {
@@ -138,6 +219,7 @@ void GameManager::resetGame() {
     player1Score = 0;
     player2Score = 0;
     gameOver = false;
+    winner = 0;
     initializeGame();
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "/opt/homebrew/Cellar/raylib/5.5/include/raylib.h"
+#include "raylib.h"
 #include <random>
 
 namespace PongPlusPlus {
