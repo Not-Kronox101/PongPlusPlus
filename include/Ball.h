@@ -35,4 +35,4 @@ private:
     const Paddle* lastHitPaddle;
 };
 
-} // namespace PongPlusPlus 
+} 

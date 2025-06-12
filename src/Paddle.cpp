@@ -51,4 +51,4 @@ void Paddle::resize(float scale) {
     if (y + height > SCREEN_HEIGHT) y = SCREEN_HEIGHT - height;
 }
 
-} // namespace PongPlusPlus 
+}

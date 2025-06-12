@@ -16,17 +16,13 @@ GameManager::GameManager()
 GameManager::~GameManager() = default;
 
 void GameManager::initializeGame() {
-    // Create paddles
     player1 = std::make_unique<Paddle>(50, SCREEN_HEIGHT / 2 - PADDLE_HEIGHT / 2);
     player2 = std::make_unique<Paddle>(SCREEN_WIDTH - 50 - PADDLE_WIDTH, SCREEN_HEIGHT / 2 - PADDLE_HEIGHT / 2);
     
-    // Create ball
     ball = std::make_unique<Ball>();
     
-    // Create power-up
     powerUp = std::make_unique<PowerUp>();
     
-    // Create UI
     ui = std::make_unique<UI>();
 }
 
@@ -39,27 +35,22 @@ void GameManager::update() {
             break;
             
         case GameState::PLAYING:
-            // Update paddles
             player1->update(true);
             player2->update(false);
             
-            // Update main ball
             ball->update(*player1, *player2);
             
-            // Update power-up
             powerUp->update(*ball);
-            
-            // Handle power-up spawning
+
+
             powerUpSpawnTimer += GetFrameTime();
             if (powerUpSpawnTimer >= POWERUP_SPAWN_INTERVAL) {
                 spawnPowerUp();
                 powerUpSpawnTimer = 0.0f;
             }
             
-            // Handle power-up collision
             handlePowerUpCollision();
-            
-            // Handle ball out of bounds
+
             handleBallOutOfBounds();
             
             // Check for game over
@@ -89,20 +80,15 @@ void GameManager::draw() {
                 break;
                 
             case GameState::PLAYING:
-                // Draw paddles
                 player1->draw();
                 player2->draw();
                 
-                // Draw ball
                 ball->draw();
                 
-                // Draw power-up
                 powerUp->draw();
                 
-                // Draw UI
                 ui->drawScore(player1Score, player2Score);
                 
-                // Draw power-up message if active
                 if (powerUp->getMessageTimer() > 0) {
                     ui->drawPowerUpMessage(powerUp->getMessage());
                 }
@@ -223,4 +209,4 @@ void GameManager::resetGame() {
     initializeGame();
 }
 
-} // namespace PongPlusPlus 
+} 

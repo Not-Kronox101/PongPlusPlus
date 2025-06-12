@@ -52,4 +52,4 @@ private:
     int winner; // 1 for player1, 2 for player2, 0 for no winner yet
 };
 
-} // namespace PongPlusPlus 
+} 

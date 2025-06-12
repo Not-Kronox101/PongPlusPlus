@@ -17,15 +17,12 @@ Ball::Ball()
 void Ball::update(Paddle& p1, Paddle& p2) {
     float deltaTime = GetFrameTime();
     
-    // Store previous position for collision detection
     float prevX = x;
     float prevY = y;
     
-    // Update position
     x += velocity.x * deltaTime;
     y += velocity.y * deltaTime;
     
-    // Check paddle collisions with previous position
     if (checkPaddleCollision(p1, prevX, prevY)) {
         handlePaddleCollision(p1);
         lastHitPaddle = &p1;
@@ -37,13 +34,11 @@ void Ball::update(Paddle& p1, Paddle& p2) {
         hasHitPaddle = true;
     }
     
-    // Check wall collisions
     if (y - radius <= 0 || y + radius >= SCREEN_HEIGHT) {
         velocity.y = -velocity.y;
     }
 
     if (hasHitPaddle) {
-        // Increase speed gradually, but don't exceed maximum speed
         float newSpeed = speed * BALL_SPEED_INCREASE;
         if (newSpeed <= BALL_MAX_SPEED) {
             setSpeed(newSpeed);
@@ -74,7 +69,6 @@ void Ball::reset() {
 
 void Ball::setSpeed(float newSpeed) {
     speed = newSpeed;
-    // Maintain direction but update speed
     float magnitude = sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
     velocity.x = (velocity.x / magnitude) * speed;
     velocity.y = (velocity.y / magnitude) * speed;
@@ -87,7 +81,6 @@ bool Ball::checkPaddleCollision(const Paddle& paddle, float prevX, float prevY) 
     float ballTop = y - radius;
     float ballBottom = y + radius;
     
-    // Calculate paddle boundaries
     float paddleLeft = paddle.getX();
     float paddleRight = paddle.getX() + paddle.getWidth();
     float paddleTop = paddle.getY();
@@ -111,7 +104,6 @@ bool Ball::checkPaddleCollision(const Paddle& paddle, float prevX, float prevY) 
 }
 
 void Ball::handlePaddleCollision(const Paddle& paddle) {
-    // Calculate relative intersection point (-1 to 1)
     float relativeIntersectY = (paddle.getY() + (paddle.getHeight() / 2)) - y;
     float normalizedIntersectY = relativeIntersectY / (paddle.getHeight() / 2);
     
@@ -137,4 +129,4 @@ void Ball::handlePaddleCollision(const Paddle& paddle) {
     }
 }
 
-} // namespace PongPlusPlus 
+} 

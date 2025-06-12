@@ -66,4 +66,4 @@ void UI::drawPowerUpMessage(const char* message) const {
     DrawTextEx(font, message, position, fontSize * 0.5f, 1, YELLOW);
 }
 
-} // namespace PongPlusPlus 
+} 

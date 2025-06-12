@@ -32,4 +32,4 @@ float clamp(float value, float min, float max);
 float getRandomFloat(float min, float max);
 int getRandomInt(int min, int max);
 
-} // namespace PongPlusPlus 
+} 

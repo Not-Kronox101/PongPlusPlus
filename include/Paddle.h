@@ -33,4 +33,4 @@ private:
     float speedMultiplier;
 };
 
-} // namespace PongPlusPlus 
+}

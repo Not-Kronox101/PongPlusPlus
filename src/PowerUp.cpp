@@ -19,12 +19,10 @@ PowerUp::PowerUp()
 void PowerUp::update(Ball& ball) {
     if (!active) return;
     
-    // Check collision with ball
     float dx = ball.getX() - x;
     float dy = ball.getY() - y;
     float distance = sqrt(dx * dx + dy * dy);
     
-    // Update message timer
     if (messageTimer > 0) {
         messageTimer -= GetFrameTime();
         if (messageTimer <= 0) {
@@ -64,23 +62,20 @@ void PowerUp::draw() const {
     }
     
     // Draw square instead of circle
-    DrawRectangle(x - size/2, y - size/2, size, size, color);
+    DrawCircle(x - size/2, y - size/2, size, size, color);
 }
 
 void PowerUp::spawn() {
     active = true;
     
     // Calculate the middle area between paddles
-    float leftBound = 50 + PADDLE_WIDTH + POWERUP_SIZE;// Right edge of player 1's paddle
-    float rightBound = SCREEN_WIDTH - 50 - PADDLE_WIDTH - POWERUP_SIZE;  // Left edge of player 2's paddle
+    float leftBound = 50 + PADDLE_WIDTH + POWERUP_SIZE;
+    float rightBound = SCREEN_WIDTH - 50 - PADDLE_WIDTH - POWERUP_SIZE;  
     
-    // Set x position within the middle area
+    // Set x, y positions within the middle area
     x = getRandomFloat(leftBound, rightBound);
-    
-    // Set y position within the screen height
     y = getRandomFloat(size, SCREEN_HEIGHT - size);
     
-    // Randomly select power-up type
     int typeIndex = getRandomInt(0, 2);
     type = static_cast<PowerUpType>(typeIndex);
 }
@@ -112,7 +107,7 @@ void PowerUp::apply(Ball& ball) {
             break;
     }
     
-    messageTimer = 2.0f;  // Show message for 2 seconds
+    messageTimer = 2.0f; 
 }
 
-} // namespace PongPlusPlus 
+} 

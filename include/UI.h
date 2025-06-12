@@ -20,4 +20,4 @@ private:
     int fontSize;
 };
 
-} // namespace PongPlusPlus 
+}
