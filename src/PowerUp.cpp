@@ -62,7 +62,7 @@ void PowerUp::draw() const {
     }
     
     // Draw square instead of circle
-    DrawCircle(x - size/2, y - size/2, size, size, color);
+    DrawRectangle(x - size/2, y - size/2, size, size, color);
 }
 
 void PowerUp::spawn() {
